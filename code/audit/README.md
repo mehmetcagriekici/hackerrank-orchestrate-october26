@@ -1,6 +1,8 @@
-# audit/ — Stage 2
+# audit/ (Stage 2, deterministic)
 
-Receives the organizer's per-case JSON bundle together with `deletion_rules.csv` and the case's claims (`reported_status`, `reported_at`).
+Turns a case bundle plus `deletion_rules.csv` into `deletion_status` and ordered steps. No LLM is involved.
 
-- **Audit LLM.** Decides `COMPLETE` or `INCOMPLETE` and produces the ordered `FINDING` → `REMEDIATION` → `VERIFICATION` steps (AGENTS.md §6.3–§6.6).
-- **Output (code).** Validates every step (allowed operations and states, consecutive `step_no`, evidence rules), then writes `output.csv` at the repository root: 518 rows, sorted by `case_id`.
+| File | What it does |
+|---|---|
+| `rules.py` | **State:** for each resource, the latest observation at or before `audit_at` wins. When two observations share a time, a surviving copy beats an absence. Observations come from explicit results (`FOUND`/`NOT_FOUND`/`hit`/`IDENTIFIABLE`…), `404`/`rows=0`, `enabled`, `restore_allowed`/`deletion_block`, and whether PII fields hold values. Reported statuses and activity results are treated as claims and never set state. **Category:** taken from `record_type` when present, otherwise inferred from the resource prefix (`contact_*` lookups → `SECONDARY_IDENTIFIER`; support records with a file → `SUPPORT_ATTACHMENT`). **Plan:** the policy action (DELETE / REDACT / ANONYMIZE / RETAIN; data flows; backups) maps each violation to finding → remediation → verification. **Status:** any finding means `INCOMPLETE`, otherwise `COMPLETE`. COMPLETE verification steps cite evidence; INCOMPLETE future steps cite `""`. **Order:** follows the samples. Findings: REMAINING, EXPOSED, FLOW, RESTORE. Remediation: DISABLE, BLOCK, DELETE, REDACT, ANONYMIZE. Verification: ABSENT, PRESENT, REDACTED, ANONYMIZED, DISABLED, BLOCKED. Within each group, steps are sorted by `system_id` and then `resource_id`. |
+| `output.py` | Contract validator (field order, consecutive `step_no`, phase order, allowed operation/state pairs, evidence rules) and `output.csv` writer. Rows are sorted by case number. |

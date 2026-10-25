@@ -54,6 +54,8 @@ ORGANIZER (code/organizer/), code only, never decides
   parsers/        sql (in-memory SQLite) | json (any nesting) | log (6 styles + trace ids) | txt | png/pdf (LLM cache)
   organizer.py    evidence captured <= audit_at; pass 1 = records/traces naming the person -> resource IDs;
                   pass 2 = every record about those resources; SQL absences; activity rows
+  account_linker.py  deleted account profiles <- deletion-worker rows, one-to-one by timing (20/20 on samples)
+  extract_media.py   one-time vision-LLM extraction of PNG/PDF evidence
 
 AUDIT (code/audit/), deterministic rules
   rules.py        latest observation per resource -> state; policy action by data category;
