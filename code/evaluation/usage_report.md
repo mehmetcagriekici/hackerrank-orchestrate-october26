@@ -10,7 +10,7 @@
 | Audit | none: deterministic rules | 0 | — |
 
 Every LLM result is cached (`.cache/gate_decisions.json`, `.cache/extractions/`). The run that wrote
-the final `output.csv` reused those caches and made **0 new calls** (runtime 12 s). The table below
+the final `output.csv` reused those caches and made **0 new calls** (runtime 27 s). The table below
 therefore reports the calls that produced the cached results the final run depends on.
 
 ## Tokens

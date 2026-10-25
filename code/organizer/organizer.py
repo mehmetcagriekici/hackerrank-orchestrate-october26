@@ -49,8 +49,11 @@ class Organizer:
         self.parsed = {row["file_id"]: parse_file(DATASET_DIR / row["file_path"]) for row in self.manifest}
         self.activity = _read_csv("system_activity.csv")
 
-    def build_bundle(self, case: dict, links: dict[str, set[str]]) -> dict | None:
-        """Return the case's audit bundle, or None when no resource links to it."""
+    def build_bundle(self, case: dict, links: dict[str, set[str]], extra_resources: set[str] = frozenset()) -> dict | None:
+        """Return the case's audit bundle, or None when no resource links to it.
+
+        extra_resources: resources linked by other means (account_linker's workflow timing).
+        """
         audit_at = case["audit_at"]
         link_values = set().union(*links.values())
         in_time = [row for row in self.manifest if row["captured_at"] <= audit_at]
@@ -66,6 +69,7 @@ class Organizer:
                 if record in hits or record["fields"].get("trace") in traces:
                     resources.add(record["fields"].get("resource_id", ""))
         resources.discard("")
+        resources |= set(extra_resources)
         if not resources:
             return None
 

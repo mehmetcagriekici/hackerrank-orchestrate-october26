@@ -63,11 +63,12 @@ AUDIT (code/audit/), deterministic rules
 
 Key decisions:
 - **LLMs only where language or vision is needed.** That's the multilingual request gate and reading
-  screenshots/PDFs. The audit is rule-based: fast (12 s for 518 cases), repeatable, and explainable.
+  screenshots/PDFs. The audit is rule-based: fast (~30 s for 518 cases), repeatable, and explainable.
 - **Reported statuses and activity results are claims.** Only evidence observations set a resource's state.
 - **The latest observation at or before `audit_at` wins.** A copy that still exists (for example in a failover
   replica) beats a same-time absence.
-- **No guessing.** Resources are linked only through identifiers, `user_id`, or a shared log trace.
+- **Grounded links only.** Resources are linked through identifiers, `user_id`, a shared log trace, or (for deleted
+  account profiles) a one-to-one assignment of deletion-worker activity rows by timing, validated 20/20 on samples.
 
 ## Layout
 
@@ -83,7 +84,7 @@ Key decisions:
 
 ## Results (32 public samples)
 
-Status accuracy **1.000**, step precision **0.994**, step recall **0.819**, step F1 **0.898**.
+Status accuracy **1.000**, step precision **0.989**, step recall **0.917**, step F1 **0.952**, exact sequence **0.500**.
 See `code/evaluation/evaluation_report.md`.
 
 ## Packaging
